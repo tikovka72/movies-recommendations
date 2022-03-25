@@ -29,7 +29,7 @@ def apply_genres(dataframe: pd.DataFrame) -> (pd.DataFrame, tuple):
     for i in unique_genres:
         dataframe.loc[
             dataframe['genres'].apply(lambda x: i in x), i] = 1
-    dataframe.drop(columns_to_drop='genres')
+    dataframe = dataframe.drop(columns='genres')
     return dataframe, tuple(unique_genres)
 
 
@@ -66,8 +66,8 @@ def apply_production_countries(
         dataframe.loc[
             dataframe['production_countries'].apply(lambda x: i in x), i] = 1
         if dataframe[i].sum() < 2:
-            dataframe.drop(columns_to_drop=i)
-    dataframe.drop(columns_to_drop='production_countries')
+            dataframe = dataframe.drop(columns=i)
+    dataframe = dataframe.drop(columns='production_countries')
     return dataframe, tuple(unique_production_countries)
 
 
@@ -83,7 +83,7 @@ def apply_release_date(dataframe: pd.DataFrame) -> pd.DataFrame:
 
 df = drop(df, ['homepage', 'id', 'budget', 'original_language',
                'production_companies', 'keywords',
-               'revenue', 'original_title',
+               'revenue', 'original_title', 'spoken_languages'
                ])
 
 columns = []

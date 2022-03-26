@@ -81,7 +81,7 @@ def apply_release_date(dataframe: pd.DataFrame) -> pd.DataFrame:
     return dataframe
 
 
-df = drop(df, ['homepage', 'id', 'budget', 'original_language',
+df = drop(df, ['homepage', 'budget', 'original_language',
                'production_companies', 'keywords',
                'revenue', 'original_title', 'spoken_languages'
                ])

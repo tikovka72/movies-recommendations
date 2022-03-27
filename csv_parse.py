@@ -1,10 +1,15 @@
 import pandas as pd
 from json import loads
 import numpy as np
-from pprint import pprint
 from typing import Sized
 
-df = pd.read_csv('csv/movies_raw.csv')
+
+def q(question: str) -> bool:
+    answer = ''
+    while True:
+        if answer.lower().strip() in ('yes', 'no', 'y', 'n'):
+            return 'y' in answer.lower()
+        answer = input(f'{question} - ')
 
 
 def drop(dataframe: pd.DataFrame,
@@ -81,23 +86,22 @@ def apply_release_date(dataframe: pd.DataFrame) -> pd.DataFrame:
     return dataframe
 
 
-df = drop(df, ['homepage', 'budget', 'original_language',
-               'production_companies', 'keywords',
-               'revenue', 'original_title', 'spoken_languages'
-               ])
+def main():
+    df = pd.read_csv('csv/movies_raw.csv')
 
-columns = []
+    df = drop(df, ['homepage', 'budget', 'original_language',
+                   'production_companies', 'keywords',
+                   'revenue', 'original_title', 'spoken_languages'
+                   ])
+    df, genres = apply_genres(df)
+    df, production_countries = apply_production_countries(df)
+    df = apply_release_date(df)
+    df = df[df['status'] == 'Released']
 
-df, genres = apply_genres(df)
-columns += genres
+    if q('Сохранить изменения? (Y/n)'):
+        df.to_csv('csv/movies.csv')
+        print('Изменения сохранены')
 
-# TODO разобраться с ключевыми словами
-# df = apply_keywords(df)
-df, production_countries = apply_production_countries(df)
-columns += production_countries
 
-df = apply_release_date(df)
-df = df[df['status'] == 'Released']
-
-df.to_csv('csv/movies.csv')
-
+if __name__ == '__main__':
+    main()

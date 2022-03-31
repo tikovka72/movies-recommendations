@@ -42,12 +42,12 @@ def apply_keywords(dataframe: pd.DataFrame) -> pd.DataFrame:
     unique_keywords = set()
 
     dataframe['keywords'] = tuple(map(
-        lambda jsons: tuple(
+        lambda jsons: ';'.join(tuple(
             map(lambda json: (json['name'],
                               unique_keywords.add(json['name']))[0],
-                loads(jsons))),
+                loads(jsons)))),
         tuple(dataframe['keywords'])))
-    print(len(unique_keywords), unique_keywords)
+
     return dataframe
 
 
@@ -90,10 +90,11 @@ def main():
     df = pd.read_csv('csv/movies_raw.csv')
 
     df = drop(df, ['homepage', 'budget', 'original_language',
-                   'production_companies', 'keywords',
+                   'production_companies',
                    'revenue', 'original_title', 'spoken_languages'
                    ])
     df, genres = apply_genres(df)
+    df = apply_keywords(df)
     df, production_countries = apply_production_countries(df)
     df = apply_release_date(df)
     df = df[df['status'] == 'Released']

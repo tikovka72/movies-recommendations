@@ -24,8 +24,10 @@ class CustomTokenizer:
     def _get_indexes(self, words: Iterable) -> np.array:
         return np.array(
             tuple(filter(
-                bool,
-                self.tokenizer.texts_to_sequences(words)))).flatten()
+                lambda index: index != -1,
+                map(lambda w: w[0] if len(w) else -1,
+                    self.tokenizer.texts_to_sequences(words)))))\
+            .flatten().astype(int)
 
     def get_binary_indexes(self, words: Iterable) -> np.array:
         return self._indexes_to_binary(self._get_indexes(words))

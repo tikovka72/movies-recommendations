@@ -22,7 +22,8 @@ class CustomTokenizer:
         return binary_words
 
     def _get_indexes(self, words: Iterable) -> np.array:
-        return np.array(self.tokenizer.texts_to_sequences(words)
+        return np.array(filter(bool,
+                               self.tokenizer.texts_to_sequences(words))
                         ).flatten()
 
     def get_binary_indexes(self, words: Iterable) -> np.array:

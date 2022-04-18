@@ -4,6 +4,8 @@ import numpy as np
 from pickle import load
 from typing import Iterable
 
+from functools import lru_cache
+
 import pandas as pd
 from tensorflow.keras.preprocessing.text import Tokenizer
 
@@ -51,18 +53,21 @@ class CustomTokenizer:
     def cut_words(self, words: str) -> list:
         return words.split(self.splitter)
 
-    def _get_similar_words(self, indexes) -> np.array:
+    def _get_similar_words(self, indexes: np.array) -> np.array:
+        @lru_cache(maxsize=1024)
+        def get_similar_word(word_index: int) -> np.array:
+            return np.array(
+                [int(SequenceMatcher(
+                    None, self.all_words[word_index],
+                    self.all_words[temp_index])
+                     .ratio() > self.MIN_RATIO)
+
+                 for temp_index in range(self.bag_size)])
+
         similar_words = np.zeros(self.bag_size)
 
         for index in indexes:
-            similar_words += \
-                np.array(
-                    [int(SequenceMatcher(
-                        None, self.all_words[index],
-                        self.all_words[temp_index])
-                         .ratio() > self.MIN_RATIO)
-
-                     for temp_index in range(self.bag_size)])
+            similar_words += get_similar_word(index)
         return np.where(similar_words > 0)
 
 
@@ -73,10 +78,13 @@ def testing_similar_words():
     keywords = my_tokenizer.cut_words(keywords[0])
     indexes1 = np.sort(my_tokenizer._get_indexes(keywords))
     indexes2 = np.sort(
-        np.where(my_tokenizer.get_binary_indexes(keywords, True) > 0)[0])
+        np.where(my_tokenizer.get_binary_indexes(keywords, True) > 0)[
+            0])
     max_len_indexes1 = len(my_tokenizer.tokenizer.index_word[
-        max(indexes1,
-            key=lambda x: len(my_tokenizer.tokenizer.index_word[x]))])
+                               max(indexes1,
+                                   key=lambda x: len(
+                                       my_tokenizer.tokenizer.index_word[
+                                           x]))])
 
     for i in indexes1:
         word = my_tokenizer.tokenizer.index_word[i]

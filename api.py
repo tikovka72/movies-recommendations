@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 
 class FilmsApi:
@@ -14,6 +15,13 @@ class FilmsApi:
             return None
         return np.where(self.titles == film_title)[0][0]
 
+    def get_similar_films_ids(self, film_id, count=15):
+        film_data = self.keywords_and_genres[film_id]
 
-fa = FilmsApi()
-print(fa.get_film_id_by_title('Spectre'))
+        return np.argsort(cosine_similarity(
+                film_data.reshape(1, -1),
+                self.keywords_and_genres))[0][-count - 1:-1]
+
+    def get_films_titles_by_ids(self, ids):
+        return self.titles[ids]
+

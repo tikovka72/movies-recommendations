@@ -1,2 +1,4 @@
 .other
-vecotors_decoded.npy
+keywords.npy
+keywords_with_genres.npy
+titles.npy

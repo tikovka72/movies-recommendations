@@ -19,7 +19,7 @@ class FilmsApi:
         film_data = self.keywords_and_genres[film_id]
 
         return np.argsort(cosine_similarity(
-            film_data.reshape(1, -1),
+            film_data,
             self.keywords_and_genres))[0][-count - 1:-1]
 
     def get_films_titles_by_ids(self, ids):
@@ -30,7 +30,3 @@ class FilmsApi:
             np.char.find(
                 np.char.lower(np.array(self.titles, dtype='<U10')),
                 fragment.lower()) >= 0)[0]
-
-
-fa = FilmsApi()
-print(fa.search_films_ids_by_fragment('A'))
